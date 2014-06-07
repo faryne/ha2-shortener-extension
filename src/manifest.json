@@ -1,0 +1,22 @@
+{
+  "manifest_version": 2,
+  "name":             "__MSG_productName__",
+  "version":          "0.7",
+  "description":      "__MSG_productDescription__",
+  "background":       {
+    "page":           "background.html"
+  },
+  "web_accessible_resources": [
+    "small1.png", "medium1.png", "big1.png"
+  ],
+  "icons":            {
+    "16":   "small1.png",
+    "48":   "medium1.png",
+    "128":  "big1.png"
+  },
+  "permissions":      [
+    "webRequest", "contextMenus", "notifications", 
+    "http://lab.ha2.tw/"
+  ],
+  "default_locale": "zh_TW"
+}

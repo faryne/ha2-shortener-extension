@@ -1,0 +1,18 @@
+{
+  "productName": {
+    "message":      "ha2.tw提供的縮網址工具",
+    "description":  "main name"
+  },
+  "productDescription": {
+    "message":      "在任何頁面按下右鍵就可以縮網址了^.<",
+    "description":  "main description"
+  },  
+  "funcTitleShorten": {
+    "message":      "縮網址囉～",
+    "description":  "func description: shorten"
+  },
+  "funcTitleTrack": {
+    "message":      "反查網址導向",
+    "description":  "func description: track"
+  }
+}
