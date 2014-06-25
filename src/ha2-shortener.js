@@ -8,8 +8,6 @@ function shortener_onclick (info, tab) {
   doRequest(domain, url);
 }
 
-var notification1;
-
 function copy_to_clipboard (url)
 {
   // 複製到剪貼簿
@@ -21,50 +19,45 @@ function copy_to_clipboard (url)
   bg.document.execCommand("Copy");
   clipboardholder.style.display = "none";
 }
+function cb_notification ($id)
+{
+}
+
 function webshot_onclick (info, tab)
 {
-  notification1 = webkitNotifications.createNotification(
-    'small1.png',
-    '截圖中',
-    "請稍候並且不要重新整理頁面"
-  );
-  notification1.show();
+  chrome.notifications.create('StartWebShot', {"title":"截圖中", "type":"basic", "message":"請稍候並且不要重新整理頁面", "iconUrl":"small1.png"}, cb_notification);
   $.ajax({
     'type':     'post',
     'url':      'http://lab.ha2.tw/webshot/api/capture.json',
     'dataType': 'json',
     'data':     {url: info.pageUrl},
     success:    function(obj) {
-      notification1.cancel();
-      notification = webkitNotifications.createNotification(
-        'small1.png',
-        '截圖完成',
-        "截圖網址："+obj.img_url+"; 並且複製到剪貼簿了！"
-      );
+      chrome.notifications.clear('StartWebShot', cb_notification);
+      
+      if (typeof obj.error !== 'undefined')
+      {
+        chrome.notifications.create('FailWebShot', {"title":"截圖失敗", "type":"basic", "message":obj.error, "iconUrl":"small1.png"}, cb_notification);
+        setTimeout(function(){
+          chrome.notifications.clear('FailWebShot', cb_notification);
+        }, 2000);
+        return;
+      }
+      chrome.notifications.create('EndWebShot', {"title": "截圖完成", "type":"basic", "message":"截圖網址："+obj.img_url+"; 並且複製到剪貼簿了！", "iconUrl":"small1.png"}, cb_notification);     
       copy_to_clipboard(obj.img_url);
       
-      notification.show();
+      
       setTimeout(function(){
-        notification.cancel();
+        chrome.notifications.clear('EndWebShot', cb_notification);
       }, 2000);
     },
     error:      function(req, e, t) {
       var message = e + (t == "" ? "" : ("("+t+")"));
-      notification = webkitNotifications.createNotification(
-        'small1.png', 
-        '發生錯誤了',
-        message
-      );
-      notification.show();
-      setTimeout(function(){
-        notification.cancel();
-      }, 2000);
-      console.log("發生錯誤了......" + message);
+      
+      chrome.notifications.create('ErrorWebShot', {"title":"發生錯誤了", "type":"basic", "message":message, "iconUrl":"small1.png"}, cb_notification);
     }
   });
 }
 
-var notification;
 function doRequest (domain, url) {
   $.ajax({
     'type':     'post',
@@ -73,39 +66,24 @@ function doRequest (domain, url) {
     'data':     {domain:domain, url:url},
     success:    function(e) {
       shortUrl = e.result.shortUrl;
-      notification = webkitNotifications.createNotification(
-        'small1.png',
-        '縮好了！',
-        "短網址："+shortUrl+"; 並且複製到剪貼簿了！"
-      );
-      
-      console.log("短網址："+shortUrl+"; 並且複製到剪貼簿了！");
-      notification.onclick = function (e) {
-        window.open(shortUrl);
-        e.currentTarget.cancel();
-      };
+      chrome.notifications.create('StartShortUrl', {"title":"縮好了！", "type":"basic", "message":"短網址："+shortUrl+"; 並且複製到剪貼簿了！", "iconUrl":"small1.png"}, cb_notification);
+      chrome.notifications.onClicked.addListener(function(id){
+        if (id == "StartShortUrl")
+        {
+          window.open(shortUrl);
+          chrome.notifications.clear('StartShortUrl', cb_notification);
+        }
+        return;
+      });
       
       copy_to_clipboard(shortUrl);
-
-      //
-      notification.show();
-      setTimeout(function(){
-        notification.cancel();
-      }, 2000);
       
     },
     error:      function(req, e, t) {
       var message = e + (t == "" ? "" : ("("+t+")"));
-      notification = webkitNotifications.createNotification(
-        'small1.png', 
-        '發生錯誤了',
-        message
-      );
-      notification.show();
-      setTimeout(function(){
-        notification.cancel();
-      }, 2000);
-      console.log("發生錯誤了......" + message);
+      
+      chrome.notifications.create('ErrorShortUrl', {"title":"發生錯誤了", "type":"basic", "message":message, "iconUrl":"small1.png"}, cb_notification);
+
     }
   });
 }

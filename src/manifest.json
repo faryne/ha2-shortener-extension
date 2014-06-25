@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name":             "__MSG_productName__",
-  "version":          "0.7",
+  "version":          "0.71",
   "description":      "__MSG_productDescription__",
   "background":       {
     "page":           "background.html"
