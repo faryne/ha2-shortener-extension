@@ -1,0 +1,33 @@
+<!-- options.html -->
+<!doctype html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+	<style type="text/css">
+	</style>
+</head>
+<body>
+
+<script type="text/javascript" src="scripts/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="scripts/websql.js" charset="utf-8"></script>
+
+<div id="wrapper">
+<h2>設定自定網域的縮網址（僅限 bit.ly）</h2>
+
+<fieldset>
+	<legend>新增新的認證資訊</legend>
+	<p>設定前，請先到 bit.ly 申請 client_id 和 client_secret，其中 App Link 為 https://hmnmebggbipndpobodcdooilmlmmgfoc.chromiumapp.org/ ， Redirect URI 為 https://hmnmebggbipndpobodcdooilmlmmgfoc.chromiumapp.org/auth  <a href="http://imgur.com/7qBqxTU" target="_blank">參考圖片</a></p>
+	<p><label>識別名稱（會顯示在功能表上的）</label><input type="text" required id="identifier"></p>
+	<p><label>client_id</label><input type="text" required id="client_id"></p>
+	<p><label>client_secret</label><input type="text" required id="client_secret"></p>
+	<p><button type="submit" id="save_credential">儲存資料</button></p>
+</fieldset>
+
+<h2>目前已設定的認證資訊</h2>
+<button id="delete_credential">刪除選定的認證</button>
+<ul id="my_credentials"></ul>
+</div>
+
+<script type="text/javascript" src="scripts/options.js"></script>
+</body>
+</html>

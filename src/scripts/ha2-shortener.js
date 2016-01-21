@@ -1,5 +1,6 @@
-var domains = ["633.xxx", "0w0.cc", "maid.tw", "goo.gl", "is.gd", "faryne.at"];
-var shortUrl = "";
+var domains     = ["0w0.cc", "maid.tw", "goo.gl", "is.gd", "faryne.at"];
+var shortUrl    = "";
+var rows        = new db().read_keys();
 
 function shortener_onclick (info, tab) {
   var url = info.pageUrl;
@@ -59,9 +60,18 @@ function webshot_onclick (info, tab)
 }
 
 function doRequest (domain, url) {
+  if (domains.indexOf(domain) >= 0)
+  {
+    request_url     =   'http://ha2.tw/shortener?format=api';
+    request_params  =   {domain:domain, url:url};
+  } else 
+  {
+    request_url     =   'https://api-ssl.bitly.com/v3/shorten';
+    request_params  =   {}
+  }
   $.ajax({
     'type':     'post',
-    'url':      'http://lab.ha2.tw/shortener?format=api',
+    'url':      'http://ha2.tw/shortener?format=api',
     'dataType': 'json',
     'data':     {domain:domain, url:url},
     success:    function(e) {
@@ -143,6 +153,29 @@ for (var i in domains) {
     "onclick":  shortener_onclick
   });
 }
+// 自訂網域部分
+chrome.contextMenus.create({
+  "parentId":     parent,
+  "type":         "separator"
+});
+  
+if (rows.length > 0)
+{
+  for (var i in rows)
+  {
+    chrome.contextMenus.create({
+      "parentId":   parent,
+      "id":         rows[i].api_key,
+      "title":      "[自定網域] " + rows[i].id,
+      "contexts":   ["all"],
+      "onclick":    shortener_onclick
+    });
+  }
+}
+
+chrome.contextMenus.create({
+  "type":     "separator" 
+});
 
 chrome.contextMenus.create({
   "title":    "網站截圖",
