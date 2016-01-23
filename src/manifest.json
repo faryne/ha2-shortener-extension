@@ -16,8 +16,10 @@
     "128":  "big1.png"
   },
   "permissions":      [
-    "webRequest", "contextMenus", "notifications", 
-    "http://ha2.tw/"
+    "webRequest", "contextMenus", "notifications", "identity",
+    "http://ha2.tw/",
+    "https://api-ssl.bitly.com/*",
+    "https://bitly.com/*"
   ],
   "default_locale": "zh_TW"
 }

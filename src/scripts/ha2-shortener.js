@@ -1,6 +1,5 @@
 var domains     = ["0w0.cc", "maid.tw", "goo.gl", "is.gd", "faryne.at"];
-var shortUrl    = "";
-var rows        = new db().read_keys();
+var custom_domains = {};
 
 function shortener_onclick (info, tab) {
   var url = info.pageUrl;
@@ -60,22 +59,44 @@ function webshot_onclick (info, tab)
 }
 
 function doRequest (domain, url) {
-  if (domains.indexOf(domain) >= 0)
+  if (domain.substr(0, 1) === '_')
   {
     request_url     =   'http://ha2.tw/shortener?format=api';
-    request_params  =   {domain:domain, url:url};
+    request_params  =   {domain:domain.substring(1), url:url};
+  } else if (domain.substr(0, 1) === '@')
+  {
+    var id = domain.substring(1);
+    if (typeof custom_domains[id] === "undefined")
+    {
+      alert("沒有相應的 access token");
+      return false;
+    }
+    request_url     =   'https://api-ssl.bitly.com/v3/shorten';
+    request_params  =   {access_token: custom_domains[id], "longUrl":url};
   } else 
   {
-    request_url     =   'https://api-ssl.bitly.com/v3/shorten';
-    request_params  =   {}
+    alert("錯誤！");
+    return false;
   }
   $.ajax({
     'type':     'post',
-    'url':      'http://ha2.tw/shortener?format=api',
+    'url':      request_url,
     'dataType': 'json',
-    'data':     {domain:domain, url:url},
+    'data':     request_params,
     success:    function(e) {
-      shortUrl = e.result.shortUrl;
+      var shortUrl  = false;
+      if (typeof e.result !== "undefined")
+      {
+        shortUrl    = typeof e.result.shortUrl !== "undefined" ? e.result.shortUrl : false;
+      } else if (typeof e.data !== "undefined")
+      {
+        shortUrl    = typeof e.data.url !== "undefined" ? e.data.url : false;
+      }
+      if (shortUrl === false)
+      {
+        alert("無法正確縮網址！");
+        return false;
+      }
       chrome.notifications.create('StartShortUrl', {"title":"縮好了！", "type":"basic", "message":"短網址："+shortUrl+"; 並且複製到剪貼簿了！", "iconUrl":"small1.png"}, cb_notification);
       chrome.notifications.onClicked.addListener(function(id){
         if (id == "StartShortUrl")
@@ -147,7 +168,7 @@ var parent  = chrome.contextMenus.create({
 for (var i in domains) {
   chrome.contextMenus.create({
     "parentId": parent,
-    "id": domains[i],
+    "id": "_" + domains[i],
     "title": "使用 "+domains[i],
     "contexts": ["all"],
     "onclick":  shortener_onclick
@@ -158,20 +179,24 @@ chrome.contextMenus.create({
   "parentId":     parent,
   "type":         "separator"
 });
-  
-if (rows.length > 0)
+
+
+function list_custom_domain (tx, result)
 {
-  for (var i in rows)
+  for (var i = 0; i < result.rows.length; i++)
   {
+    custom_domains[result.rows.item(i).id] = result.rows.item(i).access_token;
     chrome.contextMenus.create({
       "parentId":   parent,
-      "id":         rows[i].api_key,
-      "title":      "[自定網域] " + rows[i].id,
+      "id":         "@" + result.rows.item(i).id,
+      "title":      "[自定網域] " + result.rows.item(i).id,
       "contexts":   ["all"],
       "onclick":    shortener_onclick
     });
   }
 }
+
+new db().read_keys(list_custom_domain);
 
 chrome.contextMenus.create({
   "type":     "separator" 
