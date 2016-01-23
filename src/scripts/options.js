@@ -66,7 +66,8 @@ function save_credential (e)
 					}
 					d.create_key(id, client_id, client_secret, params.access_token);
 					load_credentials();
-					chrome.runtime.reload();
+					alert("執行成功，將重新啟動擴充套件以套用設定！");
+					chrome.runtime.reload()
 				}
 			});
 		}
@@ -86,6 +87,7 @@ function delete_key (e)
 				d.delete_key($(this).val());
 			});
 			load_credentials();
+			alert("執行成功，將重新啟動擴充套件以套用設定！");
 			chrome.runtime.reload();
 		}
 	}
