@@ -1,4 +1,4 @@
-var domains     = ["0w0.cc", "maid.tw", "goo.gl", "is.gd", "faryne.at"];
+var domains     = ["0w0.cc", "goo.gl", "is.gd"];
 var custom_domains = {};
 
 function shortener_onclick (info, tab) {
